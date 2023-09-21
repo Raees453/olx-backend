@@ -8,13 +8,16 @@ const globalErrorHandler = require('./utils/handlers/globalExceptionHandler');
 
 const app = express();
 
+// convert response requests to json
 app.use(express.json());
 
+// app routes
 app.use('/', routes);
 
-app.all('*', (req, res, next) =>
+app.all('*', (req, res, next) => {
+  console.log(req.params);
   next(new Exception(Errors.NO_ROUTE_FOUND.MESSAGE, Errors.NO_ROUTE_FOUND.CODE))
-);
+});
 
 app.use(globalErrorHandler);
 

@@ -15,7 +15,8 @@ const sendResponse = (doc, res, next) => {
 };
 
 const populateQuery = (query, populateOptionsList) => {
-  if (populateOptionsList) {
+  if (populateOptionsList && populateOptionsList.length > 0) {
+    console.log('Hello from populated options');
     populateOptionsList.forEach(
       (populateOptions) => (query = query.populate(populateOptions))
     );
@@ -23,16 +24,30 @@ const populateQuery = (query, populateOptionsList) => {
   return query;
 };
 
-exports.findOne = (Model, populateOptionsList) =>
+exports.findOne = (Model, ...populateOptionsList) =>
   asyncHandler(async (req, res, next) => {
     const { id } = req.params;
 
     const doc = await populateQuery(Model.findById(id), populateOptionsList);
 
-    return sendResponse(doc, res);
+    // const doc = await Model.findById(id).populate('subCategories');
+    return sendResponse(doc, res, next);
   });
 
-exports.findMany = (Model, populateOptionsList) =>
+exports.findOneAndUpdate = (Model, updateOptions, ...populateOptionsList) =>
+  asyncHandler(async (req, res, next) => {
+    const { id } = req.params;
+
+    updateOptions.new = true;
+    const doc = await populateQuery(
+      Model.findByIdAndUpdate(id, updateOptions),
+      populateOptionsList
+    );
+
+    return sendResponse(doc, res, next);
+  });
+
+exports.findMany = (Model, ...populateOptionsList) =>
   asyncHandler(async (req, res, next) => {
     const docs = await populateQuery(Model.find(), populateOptionsList);
 

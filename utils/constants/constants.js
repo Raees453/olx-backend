@@ -1,9 +1,16 @@
 const CONSTANTS = {
   NO_ROUTE_FOUND: 'No route Found',
-  PRODUCTION: 'Production',
-  DEVELOPMENT: 'Development',
+  PRODUCTION: 'production',
+  DEVELOPMENT: 'development',
   routes: {
-    CATEGORY_ROUTE: 'api/v1/category',
+    CATEGORY_ROUTE: '/api/v1/categories',
+    PRODUCT_ROUTE: '/api/v1/products',
+  },
+  models: {
+    categories: {
+      PATH: 'subCategories',
+      SELECT: 'name subCategories',
+    },
   },
 };
 

@@ -13,8 +13,10 @@ router
   );
 
 router
-  .route('./:id')
+  .route('/:id')
   .get(categoryController.getSubCategories)
   .post(categoryController.addSubCategory);
+
+router.route('/:id/sub/:catId').post(categoryController.addSubCategory);
 
 module.exports = router;
