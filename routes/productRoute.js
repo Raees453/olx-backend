@@ -12,6 +12,10 @@ router
   .get(productController.getProducts)
   .post(productController.sanitizeProduct, productController.addProduct);
 
-router.route('/:id').get(productController.getProductById);
+router
+  .route('/:id')
+  .get(productController.getProductById)
+  .patch(productController.sanitizeProduct, productController.updateProduct)
+  .delete(productController.deleteProduct);
 
 module.exports = router;

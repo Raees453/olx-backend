@@ -11,6 +11,10 @@ const CONSTANTS = {
       PATH: 'subCategories',
       SELECT: 'name subCategories',
     },
+    products: {
+      PATH: 'categories',
+      SELECT: 'name subCategories',
+    },
   },
 };
 

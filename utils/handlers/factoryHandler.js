@@ -2,7 +2,7 @@ const Exception = require('./exception');
 
 const asyncHandler = require('./asyncHandler');
 
-const sendResponse = (doc, res, next) => {
+const sendResponse = (doc, res, next, message) => {
   if (!doc) {
     return next(new Exception('No document found', 404));
   }
@@ -10,7 +10,7 @@ const sendResponse = (doc, res, next) => {
   return res.status(200).json({
     success: true,
     results: doc.length,
-    data: doc,
+    data: message ? 'Document deleted successfully' : doc,
   });
 };
 
@@ -30,7 +30,6 @@ exports.findOne = (Model, ...populateOptionsList) =>
 
     const doc = await populateQuery(Model.findById(id), populateOptionsList);
 
-    // const doc = await Model.findById(id).populate('subCategories');
     return sendResponse(doc, res, next);
   });
 
@@ -58,9 +57,9 @@ exports.updateOne = (Model) =>
   asyncHandler(async (req, res, next) => {
     const { id } = req.params;
 
-    const { modelToUpdate } = req;
+    const { modelToAdd } = req;
 
-    const doc = await Model.findByIdAndUpdate(id, modelToUpdate, { new: true });
+    const doc = await Model.findByIdAndUpdate(id, modelToAdd, { new: true });
 
     return sendResponse(doc, res, next);
   });
@@ -69,11 +68,9 @@ exports.deleteOne = (Model) =>
   asyncHandler(async (req, res, next) => {
     const { id } = req.params;
 
-    const { modelToUpdate } = req;
+    const doc = await Model.findByIdAndDelete(id);
 
-    const doc = await Model.findByIdAndDelete(id, modelToUpdate);
-
-    return sendResponse(doc, res, next);
+    return sendResponse(doc, res, next, 'Document deleted successfully.');
   });
 
 exports.addOne = (Model) =>

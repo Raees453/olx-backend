@@ -1,5 +1,7 @@
 const mongoose = require('mongoose');
 
+const Constants = require('../utils/constants/constants');
+
 const productPositionSchema = require('./schemas/positionSchema');
 
 const productSchema = new mongoose.Schema({
@@ -13,14 +15,20 @@ const productSchema = new mongoose.Schema({
     max: 5000000,
     required: [true, 'Please provide `price` as well.'],
   },
+  priceUnit: {
+    type: String,
+    enum: ['PKR', 'USD', 'GBP', 'Yun'],
+    default: 'PKR',
+  },
   description: {
     type: String,
-    minLength: 30,
+    minLength: 3,
     maxLength: 1000,
+    required: [true, 'Please provide `description` as well.'],
   },
   location: {
     type: productPositionSchema,
-    required: [true, 'Please provide `location` as well.'],
+    // required: [true, 'Please provide `location` as well.'],
   },
   imageUrls: {
     type: [String],
@@ -45,6 +53,10 @@ const productSchema = new mongoose.Schema({
         maxLength: 300,
       },
       createdAt: {
+        type: Date,
+        default: Date.now,
+      },
+      updatedAt: {
         type: Date,
         default: Date.now,
       },
@@ -77,6 +89,21 @@ const productSchema = new mongoose.Schema({
     type: Date,
     default: Date.now,
   },
+});
+
+productSchema.pre(/^find/, function (next) {
+  this.populate({
+    path: Constants.models.products.PATH,
+    select: Constants.models.products.SELECT,
+  });
+
+  next();
+});
+
+productSchema.pre('save', function (next) {
+  this.updatedAt = Date.now();
+
+  next();
 });
 
 module.exports = mongoose.model('Product', productSchema);

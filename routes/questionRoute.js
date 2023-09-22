@@ -6,12 +6,12 @@ const router = express.Router({ mergeParams: true });
 // TODO should be authorized and authenticated to do it only
 
 router
-  .route('/:productId')
+  .route('/')
   .get(productQuestionsController.getQuestions)
   .post(productQuestionsController.addQuestion);
 
 router
-  .route('/:productId/questions/:questionId')
+  .route('/:questionId')
   .get(productQuestionsController.getQuestionById)
   .patch(productQuestionsController.updateQuestionById)
   .delete(productQuestionsController.deleteQuestionById);
