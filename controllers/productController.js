@@ -49,6 +49,7 @@ exports.getProducts = asyncHandler(async (req, res, next) => {
   });
 });
 
+// TODO complete this route after user sign in feature implemented
 exports.addFavouriteProduct = asyncHandler(async (req, res, next) => {
   const { id } = req.params;
 });

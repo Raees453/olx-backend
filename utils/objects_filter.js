@@ -12,7 +12,6 @@ const DEFAULT_PAGE_NUM = 1;
 const DEFAULT_PAGE_LIMIT = 20;
 
 const DEFAULT_SEARCH_RADIUS = 10000;
-const DEFAULT_RADIUS_UNIT = 'km';
 
 class ObjectsFilter {
   constructor(Model, queryString) {
