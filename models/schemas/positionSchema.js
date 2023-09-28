@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 
-const positionSchema = new mongoose.Schema({
+const locationSchema = new mongoose.Schema({
   type: {
     type: String,
     enum: ['Point'],
@@ -12,4 +12,4 @@ const positionSchema = new mongoose.Schema({
   },
 });
 
-module.exports = positionSchema;
+module.exports = locationSchema;

@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 
 const Constants = require('../utils/constants/constants');
 
-const productPositionSchema = require('./schemas/positionSchema');
+const productLocationSchema = require('./schemas/positionSchema');
 
 const productSchema = new mongoose.Schema({
   name: {
@@ -27,8 +27,8 @@ const productSchema = new mongoose.Schema({
     required: [true, 'Please provide `description` as well.'],
   },
   location: {
-    type: productPositionSchema,
-    // required: [true, 'Please provide `location` as well.'],
+    type: productLocationSchema,
+    required: [true, 'Please provide `location` as well.'],
   },
   imageUrls: {
     type: [String],
@@ -91,17 +91,22 @@ const productSchema = new mongoose.Schema({
   },
 });
 
+productSchema.index({ location: '2dsphere' });
+
+// TODO not working at all
+productSchema.pre(/^findById/, function (next) {
+  console.log('Pre find by id middleware called', this);
+
+  this.obj.updatedAt = Date.now;
+
+  next();
+});
+
 productSchema.pre(/^find/, function (next) {
   this.populate({
     path: Constants.models.products.PATH,
     select: Constants.models.products.SELECT,
   });
-
-  next();
-});
-
-productSchema.pre('save', function (next) {
-  this.updatedAt = Date.now();
 
   next();
 });

@@ -1,16 +1,17 @@
 const Exception = require('./exception');
+const ObjectsFilter = require('../objects_filter');
 
 const asyncHandler = require('./asyncHandler');
 
-const sendResponse = (doc, res, next, message) => {
-  if (!doc) {
+const sendResponse = (docs, res, next, message) => {
+  if (!docs) {
     return next(new Exception('No document found', 404));
   }
 
   return res.status(200).json({
     success: true,
-    results: doc.length,
-    data: message ? 'Document deleted successfully' : doc,
+    results: docs.length,
+    data: message ? 'Document deleted successfully' : docs,
   });
 };
 
@@ -24,11 +25,14 @@ const populateQuery = (query, populateOptionsList) => {
   return query;
 };
 
-exports.findOne = (Model, ...populateOptionsList) =>
+exports.findOne = (Model, select, ...populateOptionsList) =>
   asyncHandler(async (req, res, next) => {
     const { id } = req.params;
 
-    const doc = await populateQuery(Model.findById(id), populateOptionsList);
+    const doc = await populateQuery(
+      Model.findById(id, select),
+      populateOptionsList
+    );
 
     return sendResponse(doc, res, next);
   });
@@ -48,7 +52,14 @@ exports.findOneAndUpdate = (Model, updateOptions, ...populateOptionsList) =>
 
 exports.findMany = (Model, ...populateOptionsList) =>
   asyncHandler(async (req, res, next) => {
-    const docs = await populateQuery(Model.find(), populateOptionsList);
+    const filteredQuery = new ObjectsFilter(Model, req.query)
+      .filter()
+      .sort()
+      .paginate()
+      .selectFields()
+      .filterByLocationRadius();
+
+    const docs = await filteredQuery.query;
 
     return sendResponse(docs, res, next);
   });

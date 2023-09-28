@@ -2,35 +2,40 @@ const Product = require('../../models/productModel');
 
 const Exception = require('../../utils/handlers/exception');
 
-const factoryHandler = require('../../utils/handlers/factoryHandler');
 const asyncHandler = require('../../utils/handlers/asyncHandler');
 
-// TODO Implement all of them
+const getProductAndQuestionIDs = (req, next) => {
+  let { id, questionId } = req.params;
 
-exports.getQuestions = asyncHandler(async (req, res, next) => {
-  const product = await Product.findById(req.params.id);
-
-  if (!product) {
-    return next(new Exception('No Product found with provided id', 404));
+  if (!id || !questionId) {
+    id = req.body.id;
+    questionId = req.body.questionId;
   }
 
-  return res.status(200).json({
-    success: true,
-    results: product.questions.length,
-    data: product.questions,
-  });
-});
+  if (!id || !questionId) {
+    return next(
+      new Exception('Please provide product id and question id', 403)
+    );
+  }
+
+  return { id, questionId };
+};
+
+const getQuestionByQuestionId = (questionId) => {
+  return Product.findOne(
+    {
+      'questions._id': questionId,
+    },
+    { 'questions.$': 1 }
+  );
+};
 
 exports.addQuestion = asyncHandler(async (req, res, next) => {
   const { question, answer } = req.body;
 
-  const modelToAdd = { question, answer };
-
-  console.log('MODEL', modelToAdd);
-
   const product = await Product.findByIdAndUpdate(
     req.params.id,
-    { $push: { questions: modelToAdd } },
+    { $push: { questions: { question, answer } } },
     {
       new: true,
     }
@@ -47,24 +52,67 @@ exports.addQuestion = asyncHandler(async (req, res, next) => {
   });
 });
 
-exports.getQuestionById = (req, res, next) => {};
+exports.getQuestions = asyncHandler(async (req, res, next) => {
+  const { id } = req.params;
+
+  const product = await Product.findById(id);
+
+  if (!product) {
+    return next(new Exception('No document found.', 404));
+  }
+
+  const questions = product.questions;
+
+  return res.status(200).json({
+    success: true,
+    results: questions.length,
+    body: questions,
+  });
+});
+
+exports.getQuestionById = asyncHandler(async (req, res, next) => {
+  const { questionId } = getProductAndQuestionIDs(req, next);
+
+  let question = await getQuestionByQuestionId(questionId);
+
+  if (!question) {
+    return next(new Exception('No Question Found!', 404));
+  }
+
+  // TODO remove this as this should not be fetched anyways, so not needed
+  question.categories = undefined;
+
+  // TODO make this fix as well, means this one is not needed at all
+  question = question.questions[0] || undefined;
+
+  return res.status(200).json({
+    success: true,
+    body: question,
+  });
+});
+
+// TODO Not working at all
 exports.updateQuestionById = asyncHandler(async (req, res, next) => {
-  const { questionId, id } = req.params;
+  const { id, questionId } = getProductAndQuestionIDs(req, next);
 
-  const { question, answer } = req.body;
+  const question = { question: req.body.question, answer: req.body.answer };
 
-  const modelToAdd = { question, answer };
+  console.log('Question: ', question, id, questionId);
 
-  const product = await Product.updateOne(
+  const product = await Product.findOneAndUpdate(
     {
-      id,
-      questions: questionId,
+      _id: id,
+      'questions._id': questionId,
     },
-    { $set: { 'questions.$': modelToAdd } },
     {
-      new: true,
-    }
+      $set: {
+        'questions.$': question,
+      },
+    },
+    { new: true }
   );
+
+  console.log('Product: ', product);
 
   if (!product) {
     return next(new Exception('No Product found with provided id', 404));
@@ -77,4 +125,29 @@ exports.updateQuestionById = asyncHandler(async (req, res, next) => {
   });
 });
 
-exports.deleteQuestionById = (req, res, next) => {};
+// TODO Not working at all
+exports.deleteQuestionById = asyncHandler(async (req, res, next) => {
+  const { id, questionId } = getProductAndQuestionIDs(req, next);
+
+  const product = await Product.findById(id);
+
+  if (!product) {
+    return next(new Exception('No Product found with provided id', 404));
+  }
+
+  console.log(product.questions);
+
+  product.questions = product.questions.filter(
+    (question) => question._id !== questionId
+  );
+
+  console.log(product.questions);
+
+  product.save({ validateBeforeSave: false });
+
+  return res.status(200).json({
+    success: true,
+    results: product.questions.length,
+    data: product.questions,
+  });
+});

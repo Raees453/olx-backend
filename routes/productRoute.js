@@ -18,4 +18,7 @@ router
   .patch(productController.sanitizeProduct, productController.updateProduct)
   .delete(productController.deleteProduct);
 
+router.route('/:id/location').patch(productController.updateProductLocation);
+router.route('/:id/favourite').patch(productController.addFavouriteProduct);
+
 module.exports = router;
