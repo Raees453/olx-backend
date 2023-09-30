@@ -1,4 +1,6 @@
 {
   "environment": "development",
-  "port": 80
+  "port": 80,
+  "emailHost": "sandbox.smtp.mailtrap.io",
+  "emailPort": 25
 }
