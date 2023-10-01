@@ -155,19 +155,22 @@ exports.authorize = asyncHandler(async (req, res, next) => {
     return next(new Exception('Nice try kid. Fuck off!', 401));
   }
 
-  const user = await User.findById(userDetails.id);
+  const user = await User.findById(userDetails.id).select('active');
 
   if (!user) {
     return next(new Exception('Nice try kid. Fuck off!', 401));
   }
 
   const result = user.checkIfPasswordChangedAfterTokenIssued(userDetails.iat);
-  console.log(result);
 
   if (!result) {
     return next(
       new Exception('Your password was changed, please login again.', 401)
     );
+  }
+
+  if (!user.active) {
+    return next(new Exception('Your account is been deleted!', 403));
   }
 
   req.user = user;

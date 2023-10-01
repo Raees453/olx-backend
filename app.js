@@ -1,4 +1,5 @@
 const express = require('express');
+const expressRateLimit = require('express-rate-limit');
 
 const Exception = require('./utils/handlers/exception');
 const Errors = require('./utils/constants/errors');
@@ -16,7 +17,9 @@ app.use('/', routes);
 
 app.all('*', (req, res, next) => {
   console.log(req.params);
-  next(new Exception(Errors.NO_ROUTE_FOUND.MESSAGE, Errors.NO_ROUTE_FOUND.CODE))
+  next(
+    new Exception(Errors.NO_ROUTE_FOUND.MESSAGE, Errors.NO_ROUTE_FOUND.CODE)
+  );
 });
 
 app.use(globalErrorHandler);

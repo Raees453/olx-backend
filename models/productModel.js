@@ -76,11 +76,11 @@ const productSchema = new mongoose.Schema({
       require: [true, 'Please provide category or category ids'],
     },
   ],
-  // owner: {
-  //   type: mongoose.Schema.Types.ObjectId,
-  //   ref: 'User',
-  //   required: [true, 'Please provide a `user id` as well'],
-  // },
+  user: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
+    required: [true, 'Please provide a `user id` as well'],
+  },
   createdAt: {
     type: Date,
     default: Date.now,

@@ -49,11 +49,6 @@ exports.getProducts = asyncHandler(async (req, res, next) => {
   });
 });
 
-// TODO complete this route after user sign in feature implemented
-exports.addFavouriteProduct = asyncHandler(async (req, res, next) => {
-  const { id } = req.params;
-});
-
 exports.updateProductLocation = asyncHandler(async (req, res, next) => {
   let id = req.params.id;
 
@@ -95,6 +90,7 @@ exports.sanitizeProduct = (req, res, next) => {
     location,
     questions,
     priceUnit,
+    user,
   } = req.body;
 
   req.modelToAdd = {
@@ -108,6 +104,7 @@ exports.sanitizeProduct = (req, res, next) => {
     questions,
     priceUnit,
     updatedAt: Date.now(),
+    user,
   };
 
   next();

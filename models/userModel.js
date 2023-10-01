@@ -1,6 +1,7 @@
 const crypto = require('crypto');
 
 const mongoose = require('mongoose');
+const slugify = require('slugify');
 const bcrypt = require('bcryptjs');
 const config = require('config');
 const validator = require('validator');
@@ -8,8 +9,36 @@ const validator = require('validator');
 const Constants = require('../utils/constants/constants');
 
 const userSchema = new mongoose.Schema({
+  name: {
+    type: String,
+    minLength: 5,
+    maxLength: 30,
+    trim: true,
+  },
+  bio: {
+    type: String,
+    trim: true,
+    minLength: [20, 'Bio must have a minimum length of 20 characters'],
+  },
+  slug: {
+    type: String,
+  },
+  gender: {
+    type: String,
+    enum: ['Male', 'Female'],
+    lowercase: true,
+  },
+  dob: {
+    type: Date,
+  },
+  phone: {
+    type: String,
+    trim: true,
+  },
   email: {
     type: String,
+    trim: true,
+    lowercase: true,
     unique: [true, 'Email already exists.'],
     required: [true, 'Please provide `email`.'],
     validate: {
@@ -66,6 +95,8 @@ const userSchema = new mongoose.Schema({
   passwordResetTokenExpiresIn: {
     type: Date,
   },
+  isEmailVerified: { type: Boolean },
+  isPhoneVerified: { type: Boolean },
 });
 
 userSchema.pre('findOne', async function (next) {
@@ -89,6 +120,8 @@ userSchema.pre('save', async function (next) {
   }
 
   this.password = await bcrypt.hash(this.password, Constants.PASSWORD_SALT);
+
+  this.slug = slugify(this.name);
 
   next();
 });
