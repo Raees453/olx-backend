@@ -7,7 +7,7 @@ const Exception = require('../utils/handlers/exception');
 const User = require('../models/userModel');
 
 const asyncHandler = require('../utils/handlers/asyncHandler');
-const emailService = require('../utils/emails');
+const emailService = require('../services/email_service');
 
 exports.signUp = asyncHandler(async (req, res, next) => {});
 
@@ -41,7 +41,11 @@ exports.login = asyncHandler(async (req, res, next) => {
     return next(new Exception('Please provide email and password', 404));
   }
 
-  const user = await User.findOne({ email });
+  const user = await User.findOne({ email }).select('+password');
+
+  if (user.passwordResetToken && user.passwordResetTokenExpiresIn) {
+    return next(new Exception('Please change your password before login', 403));
+  }
 
   if (!user) {
     return next(new Exception('No User found', 404));
@@ -129,23 +133,23 @@ exports.resetPassword = asyncHandler(async (req, res, next) => {
   });
 });
 
-const verifyAuthToken = util.promisify(jwt.verify);
+const verifyAuthToken = (token, secret) =>
+  util.promisify(jwt.verify)(token, secret);
 
-// TODO make it work after the user log in / profile flow has been completed
-exports.updatePassword = asyncHandler(async (req, res, next) => {});
+// the above written code is simply the longer version of this one
+// const verifyAuthToken = util.promisify(jwt.verify);
 
 exports.authorize = asyncHandler(async (req, res, next) => {
-  console.log('Authorize Called', req.headers);
-
   const { authorization } = req.headers;
 
   if (!authorization || !authorization.startsWith('Bearer ')) {
     return next(new Exception('Please login to access this route', 401));
   }
 
-  const token = authorization.split()[1];
+  const token = authorization.split(' ')[1];
+  const secret = process.env.JWT_SECRET;
 
-  const userDetails = verifyAuthToken(token);
+  const userDetails = await verifyAuthToken(token, secret);
 
   if (!userDetails) {
     return next(new Exception('Nice try kid. Fuck off!', 401));
@@ -157,9 +161,12 @@ exports.authorize = asyncHandler(async (req, res, next) => {
     return next(new Exception('Nice try kid. Fuck off!', 401));
   }
 
-  if (user.checkIfPasswordChangedAfterTokenIssued()) {
+  const result = user.checkIfPasswordChangedAfterTokenIssued(userDetails.iat);
+  console.log(result);
+
+  if (!result) {
     return next(
-      new Exception('Your password was changed, please login again', 401)
+      new Exception('Your password was changed, please login again.', 401)
     );
   }
 
@@ -167,3 +174,9 @@ exports.authorize = asyncHandler(async (req, res, next) => {
 
   next();
 });
+
+// TODO implement the feature
+exports.signOut = asyncHandler(async (req, res, next) => {});
+
+// TODO make it work after the user log in / profile flow has been completed
+exports.updatePassword = asyncHandler(async (req, res, next) => {});

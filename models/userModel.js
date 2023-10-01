@@ -1,7 +1,7 @@
 const crypto = require('crypto');
 
-const bcrypt = require('bcryptjs');
 const mongoose = require('mongoose');
+const bcrypt = require('bcryptjs');
 const config = require('config');
 const validator = require('validator');
 
@@ -127,19 +127,33 @@ userSchema.methods.updatePassword = async function (password, confirmPassword) {
   this.password = password;
   this.confirmPassword = confirmPassword;
 
+  this.passwordChangedAt = Date.now();
+
   await this.save();
 };
 
-userSchema.methods.checkIfPasswordChangedAfterTokenIssued = async function (
+userSchema.methods.checkIfPasswordChangedAfterTokenIssued = function (
   passwordIssuedTimestamp
 ) {
-  if (this.passwordResetTokenExpiresIn === undefined) {
+  // a user will not have any of these if the user has signed for
+  // forget or reset password
+  // meaning a user should not be authorized if the user has signed for
+  // resetting the password
+  if (this.passwordResetToken || this.passwordResetTokenExpiresIn) {
     return false;
+  }
+
+  // no password changed at property means that no need to check
+  // or compare for JWT issuance
+  if (!this.passwordChangedAt) {
+    return true;
   }
 
   // TODO Learn about how to work with dates in JS
   const passwordChangedAtTimestamp = this.passwordChangedAt.getTime() / 1000;
 
+  // password issued at should always be greater than the timestamp
+  // at which JWT was created
   return passwordChangedAtTimestamp > passwordIssuedTimestamp;
 };
 
