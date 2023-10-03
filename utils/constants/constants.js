@@ -16,6 +16,7 @@ const CONSTANTS = {
     LOCATION_ROUTE: '/api/v1/locations',
     ME_ROUTE: '' + '/api/v1/me',
     ME_PRODUCTS_ROUTE: '' + '/api/v1/me/favourites',
+    MY_PRODUCTS_ROUTE: '' + '/api/v1/me/products',
   },
   models: {
     categories: {

@@ -1,4 +1,5 @@
 const User = require('../models/userModel');
+const Product = require('../models/productModel');
 
 const Constants = require('../utils/constants/constants');
 const Exception = require('../utils/handlers/exception');
@@ -68,5 +69,21 @@ exports.deleteProfile = asyncHandler(async (req, res, next) => {
   return res.status(203).json({
     success: true,
     message: 'Your account has been deactivated!',
+  });
+});
+
+exports.getMyProduct = asyncHandler(async (req, res, next) => {
+  const { id } = req.user;
+
+  if (!id) {
+    return next(new Exception('Please login to access this feature!', 401));
+  }
+
+  const myProducts = await Product.find({ user: id });
+
+  return res.status(200).json({
+    success: true,
+    results: myProducts.length,
+    data: myProducts,
   });
 });
