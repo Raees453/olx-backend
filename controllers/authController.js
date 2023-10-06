@@ -183,3 +183,9 @@ exports.signOut = asyncHandler(async (req, res, next) => {});
 
 // TODO make it work after the user log in / profile flow has been completed
 exports.updatePassword = asyncHandler(async (req, res, next) => {});
+
+exports.loginWithGoogle = asyncHandler(async (req, res, next) => {});
+
+exports.loginWithFacebook = asyncHandler(async (req, res, next) => {});
+
+exports.loginWithPhone = asyncHandler(async (req, res, next) => {});

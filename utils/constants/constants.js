@@ -7,7 +7,10 @@ const CONSTANTS = {
   PASSWORD_RESET_EXPIRES_IN: 5 * 60 * 1000,
   MAX_LOCATION_RADIUS: 10000,
   apis: {
+    // PLACES_API_URL: 'https://maps.googleapis.com/maps/api/place/textsearch/json',
     PLACES_API_URL: 'https://maps.googleapis.com/maps/api/geocode/json',
+    AUTOCOMPLETE_API_URL:
+      'https://maps.googleapis.com/maps/api/place/autocomplete/json',
   },
   routes: {
     CATEGORY_ROUTE: '/api/v1/categories',

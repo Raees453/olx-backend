@@ -20,4 +20,6 @@ router.get('/cities', locationController.getCitiesInState);
 
 router.get('/famous', locationController.getFamousLocationsInCity);
 
+router.get('/autocomplete', locationController.getAutoCompletes);
+
 module.exports = router;
