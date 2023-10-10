@@ -11,6 +11,30 @@ const emailService = require('../services/email_service');
 
 exports.signUp = asyncHandler(async (req, res, next) => {});
 
+exports.checkForUniquePhoneOrEmail = asyncHandler(async (req, res, next) => {
+  const { email, phone } = req.body;
+
+  if (!(email || phone)) {
+    return next(new Exception('Please provide email or phone', 404));
+  }
+
+  const user = await User.findOne({
+    email: email,
+  });
+
+  if (email) {
+    return res.status(200).json({
+      success: true,
+      new: user?.email === undefined,
+    });
+  }
+
+  return res.status(200).json({
+    success: true,
+    new: user?.phone === undefined,
+  });
+});
+
 exports.signUpWithEmail = asyncHandler(async (req, res, next) => {
   console.log('Sign up called');
 

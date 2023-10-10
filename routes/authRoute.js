@@ -4,6 +4,8 @@ const authController = require('../controllers/authController');
 
 const router = express.Router();
 
+router.get('/unique', authController.checkForUniquePhoneOrEmail);
+
 router.post('/signup', authController.signUpWithEmail);
 
 router.get('/login', authController.login);
