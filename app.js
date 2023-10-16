@@ -1,5 +1,7 @@
 const express = require('express');
-const expressRateLimit = require('express-rate-limit');
+const admin = require('firebase-admin');
+
+const serviceAccount = require('./serviceAccountKey.json');
 
 const Exception = require('./utils/handlers/exception');
 const Errors = require('./utils/constants/errors');
@@ -11,6 +13,7 @@ const app = express();
 
 // convert response requests to json
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
 // app routes
 app.use('/', routes);

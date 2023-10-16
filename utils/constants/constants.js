@@ -20,6 +20,7 @@ const CONSTANTS = {
     ME_ROUTE: '' + '/api/v1/me',
     ME_PRODUCTS_ROUTE: '' + '/api/v1/me/favourites',
     MY_PRODUCTS_ROUTE: '' + '/api/v1/me/products',
+    FILES_ROUTE: '' + '/api/v1/files',
   },
   models: {
     categories: {

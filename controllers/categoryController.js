@@ -7,6 +7,15 @@ const factoryHandler = require('../utils/handlers/factoryHandler');
 exports.getCategories = factoryHandler.findMany(Category);
 exports.getSubCategories = factoryHandler.findOne(Category);
 
+exports.getAllCategories = asyncHandler(async (req, res, next) => {
+  const categories = await Category.find().populate({ path: 'subCategories' });
+
+  return res.status(200).json({
+    success: true,
+    data: categories,
+  });
+});
+
 exports.addCategory = factoryHandler.addOne(Category);
 
 // adds only the category to the sub-category of the category
