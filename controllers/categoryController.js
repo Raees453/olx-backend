@@ -8,7 +8,20 @@ exports.getCategories = factoryHandler.findMany(Category);
 exports.getSubCategories = factoryHandler.findOne(Category);
 
 exports.getAllCategories = asyncHandler(async (req, res, next) => {
-  const categories = await Category.find().populate({ path: 'subCategories' });
+  const categories = await Category.find({ image: { $ne: null } })
+    .populate({
+      path: 'subCategories',
+      populate: {
+        path: 'subCategories',
+        populate: {
+          path: 'subCategories',
+          populate: {
+            path: 'subCategories',
+          },
+        },
+      },
+    })
+    .exec();
 
   return res.status(200).json({
     success: true,

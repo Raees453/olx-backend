@@ -24,19 +24,20 @@ exports.uploadProfile = asyncHandler(async (req, res, next) => {
     return next(new Exception('Please provide a file', 404));
   }
 
-  const filename = `profile-${req.user.id}.png`;
+  const id = req.user?.id || '651746ec08a1b7cf9b481515';
+
+  const filename = `profile-${id}.png`;
 
   const destinationPath = 'profiles/' + filename;
 
+  // TODO resizing the image not working
   // file = await resizeImage(file, filename);
-
-  // console.log(file);
 
   const fileToUpload = bucket.file(destinationPath);
 
   const fileStream = fileToUpload.createWriteStream({
     metadata: {
-      contentType: req.file.mimetype,
+      contentType: file.mimetype,
     },
   });
 
@@ -48,12 +49,13 @@ exports.uploadProfile = asyncHandler(async (req, res, next) => {
   });
 
   fileStream.on('finish', async () => {
-    const expires = Date.now() + 60 * 60 * 1000;
+    const expires = Date.now() + 60 * 60 * 1000 * 24 * 30 * 12 * 50;
+
     const result = await fileToUpload.getSignedUrl({ action: 'read', expires });
 
     return res.status(200).json({
       status: true,
-      file: result,
+      url: result[0],
     });
   });
 
@@ -61,3 +63,59 @@ exports.uploadProfile = asyncHandler(async (req, res, next) => {
 });
 
 exports.uploadAdImage = asyncHandler(async (req, res, next) => {});
+
+exports.uploadFiles = asyncHandler(async (req, res, next) => {
+  let { files } = req;
+
+  if (!files) {
+    return next(new Exception('Please provide a file', 404));
+  }
+
+  const urls = [];
+
+  files.forEach((file) => {
+    const filename = `category-${file.filename}.png`;
+
+    const destinationPath = 'categories/' + filename;
+
+    // TODO resizing the image not working
+    // file = await resizeImage(file, filename);
+
+    const fileToUpload = bucket.file(destinationPath);
+
+    const fileStream = fileToUpload.createWriteStream({
+      metadata: {
+        contentType: file.mimetype,
+      },
+    });
+
+    fileStream.on('error', (err) => {
+      console.error('Error uploading file:', err);
+      return res.status(500).json({
+        success: false,
+      });
+    });
+
+    fileStream.on('finish', async () => {
+      const expires = Date.now() + 60 * 60 * 1000 * 24 * 30 * 12 * 50;
+
+      const result = await fileToUpload.getSignedUrl({
+        action: 'read',
+        expires,
+      });
+
+      urls.push(result[0]);
+
+      if (urls.length === files.length) {
+        console.log(urls);
+
+        return res.status(200).json({
+          status: true,
+          url: urls,
+        });
+      }
+    });
+
+    fileStream.end(file.buffer);
+  });
+});

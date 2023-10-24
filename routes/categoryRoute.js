@@ -17,9 +17,11 @@ router
 
 router
   .route('/:id')
-  .get(authController.authorize, categoryController.getSubCategories)
+  .get(categoryController.getSubCategories)
   .post(authController.authorize, categoryController.addSubCategory);
 
-router.route('/:id/sub/:catId').post(categoryController.addSubCategory);
+router
+  .route('/:id/sub/:catId')
+  .post(authController.authorize, categoryController.addSubCategory);
 
 module.exports = router;

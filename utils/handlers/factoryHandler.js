@@ -55,7 +55,7 @@ exports.findMany = (Model, ...populateOptionsList) =>
     const filteredQuery = new ObjectsFilter(Model, req.query)
       .filter()
       .sort()
-      .paginate()
+      // .paginate()
       .selectFields()
       .filterByLocationRadius();
 

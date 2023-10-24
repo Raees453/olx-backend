@@ -15,9 +15,13 @@ const categorySchema = new mongoose.Schema({
     {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'Category',
-      unique: true,
+      // unique: true,
     },
   ],
+  count: {
+    type: Number,
+    default: 0,
+  },
   createdAt: {
     type: Date,
     default: Date.now(),
@@ -33,6 +37,11 @@ categorySchema.pre('findOne', function (next) {
   });
 
   next();
+});
+categorySchema.post(/^findById/, function (category) {
+  category.count++;
+  category.save();
+  console.log('Incrementing category counts....');
 });
 
 module.exports = mongoose.model('Category', categorySchema);
