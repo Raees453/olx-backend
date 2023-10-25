@@ -30,7 +30,7 @@ const categorySchema = new mongoose.Schema({
 
 categorySchema.index({ _id: 1, 'subCategories._id': 1 }, { unique: true });
 
-categorySchema.pre('findOne', function (next) {
+categorySchema.pre(/^findOne/, function (next) {
   this.populate({
     path: Constants.models.categories.PATH,
     select: Constants.models.categories.SELECT,
@@ -38,10 +38,10 @@ categorySchema.pre('findOne', function (next) {
 
   next();
 });
-categorySchema.post(/^findById/, function (category) {
+
+categorySchema.post(/^findOne/, function (category) {
   category.count++;
   category.save();
-  console.log('Incrementing category counts....');
 });
 
 module.exports = mongoose.model('Category', categorySchema);

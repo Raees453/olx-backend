@@ -197,6 +197,7 @@ exports.authorize = asyncHandler(async (req, res, next) => {
     return next(new Exception('Your account is been deleted!', 403));
   }
 
+  console.log(`User Attached!!!!. ${user}`);
   req.user = user;
 
   next();

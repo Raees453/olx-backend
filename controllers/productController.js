@@ -80,6 +80,8 @@ exports.updateProductLocation = asyncHandler(async (req, res, next) => {
 });
 
 exports.sanitizeProduct = (req, res, next) => {
+  const { user } = req;
+
   const {
     name,
     description,
@@ -90,7 +92,6 @@ exports.sanitizeProduct = (req, res, next) => {
     location,
     questions,
     priceUnit,
-    user,
   } = req.body;
 
   req.modelToAdd = {
@@ -104,7 +105,7 @@ exports.sanitizeProduct = (req, res, next) => {
     questions,
     priceUnit,
     updatedAt: Date.now(),
-    user,
+    user: user._id,
   };
 
   next();

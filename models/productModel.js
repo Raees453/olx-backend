@@ -73,7 +73,7 @@ const productSchema = new mongoose.Schema({
     {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'Category',
-      require: [true, 'Please provide category or category ids'],
+      required: [true, 'Please provide category or category ids'],
     },
   ],
   user: {

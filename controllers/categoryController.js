@@ -1,4 +1,8 @@
+const mongoose = require('mongoose');
+
 const Category = require('../models/categoryModel');
+const Product = require('../models/productModel');
+
 const Exception = require('../utils/handlers/exception');
 
 const asyncHandler = require('../utils/handlers/asyncHandler');
@@ -57,6 +61,28 @@ exports.addSubCategory = asyncHandler(async (req, res, next) => {
   }
 
   return factoryHandler.findOneAndUpdate(Category, options)(req, res, next);
+});
+
+exports.getPopularCategories = asyncHandler(async (req, res, next) => {
+  const limit = 30;
+
+  const categories = await Category.find().sort({ count: -1 }).limit(limit);
+
+  const popularCategoriesWithProducts = await Promise.all(
+    categories.map(async (category) => {
+      const products = await Product.find({
+        categories: category._id,
+      }).limit(limit);
+
+      return { category, products };
+    })
+  );
+
+  res.status(200).json({
+    success: true,
+    results: popularCategoriesWithProducts.length,
+    data: popularCategoriesWithProducts,
+  });
 });
 
 exports.sanitizeCategoryRequest = (req, res, next) => {

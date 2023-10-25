@@ -3,6 +3,7 @@ const multer = require('multer');
 
 const productQuestionsRouter = require('./questionRoute');
 const productController = require('../controllers/productController');
+const authController = require('../controllers/authController');
 
 const storage = multer.memoryStorage();
 const upload = multer({ storage });
@@ -11,14 +12,12 @@ const router = express.Router();
 
 router.use('/:id/questions', productQuestionsRouter);
 
-router
-  .route('/')
-  .get(productController.getProducts)
-  .post(
-    productController.sanitizeProduct,
-    upload.array('images'),
-    productController.addProduct
-  );
+router.route('/').get(productController.getProducts).post(
+  authController.authorize,
+  productController.sanitizeProduct,
+  // upload.array('images'),
+  productController.addProduct
+);
 
 router
   .route('/:id')

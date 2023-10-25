@@ -17,7 +17,6 @@ const sendResponse = (docs, res, next, message) => {
 
 const populateQuery = (query, populateOptionsList) => {
   if (populateOptionsList && populateOptionsList.length > 0) {
-    console.log('Hello from populated options');
     populateOptionsList.forEach(
       (populateOptions) => (query = query.populate(populateOptions))
     );
@@ -92,6 +91,7 @@ exports.addOne = (Model) =>
       return next(new Exception('Please provide a model to save', 404));
     }
 
+    console.log(modelToAdd);
     const doc = await Model.create(modelToAdd);
 
     return sendResponse(doc, res, next);

@@ -6,6 +6,7 @@ const authController = require('../controllers/authController');
 const router = express.Router();
 
 router.route('/all').get(categoryController.getAllCategories);
+router.route('/popular').get(categoryController.getPopularCategories);
 
 router
   .route('/')
