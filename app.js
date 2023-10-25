@@ -16,7 +16,14 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // app routes
-app.use('/', routes);
+// app.use('/', routes);
+
+app.use('/', (_, res, next) => {
+  return res.status(200).json({
+    success: true,
+    message: 'Welcome to OLX App.',
+  });
+});
 
 app.all('*', (req, res, next) => {
   console.log(req.params);
