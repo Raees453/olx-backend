@@ -64,7 +64,8 @@ exports.addSubCategory = asyncHandler(async (req, res, next) => {
 });
 
 exports.getPopularCategories = asyncHandler(async (req, res, next) => {
-  const limit = 30;
+  const limit = 5;
+  const productsLimit = 50;
 
   const categories = await Category.find().sort({ count: -1 }).limit(limit);
 
@@ -72,7 +73,7 @@ exports.getPopularCategories = asyncHandler(async (req, res, next) => {
     categories.map(async (category) => {
       const products = await Product.find({
         categories: category._id,
-      }).limit(limit);
+      }).limit(productsLimit);
 
       return { category, products };
     })
