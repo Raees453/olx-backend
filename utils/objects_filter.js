@@ -40,10 +40,6 @@ class ObjectsFilter {
       (match) => `$${match}`
     );
 
-    if (filterObjects) {
-      console.log('Filter', queryStr, 'applied');
-    }
-
     this.query = this.query.find(JSON.parse(queryStr));
 
     return this;

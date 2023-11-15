@@ -22,7 +22,11 @@ router.route('/').get(productController.getProducts).post(
 router
   .route('/:id')
   .get(productController.getProductById)
-  .patch(productController.sanitizeProduct, productController.updateProduct)
+  .patch(
+    authController.authorize,
+    productController.sanitizeProduct,
+    productController.updateProduct
+  )
   .delete(productController.deleteProduct);
 
 router.route('/:id/location').patch(productController.updateProductLocation);

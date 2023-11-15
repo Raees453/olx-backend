@@ -31,7 +31,7 @@ exports.getProducts = asyncHandler(async (req, res, next) => {
     .filter()
     .sort()
     .paginate()
-    .selectFields()
+    // .selectFields()
     .filterByLocationRadius()
     .filterByCategoryID();
 
@@ -105,7 +105,7 @@ exports.sanitizeProduct = (req, res, next) => {
     questions,
     priceUnit,
     updatedAt: Date.now(),
-    user: user._id,
+    user: user.id,
   };
 
   next();

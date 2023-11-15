@@ -23,7 +23,6 @@ app.use('/', routes);
 // });
 
 app.all('*', (req, res, next) => {
-  console.log(req.params);
   next(
     new Exception(Errors.NO_ROUTE_FOUND.MESSAGE, Errors.NO_ROUTE_FOUND.CODE)
   );
