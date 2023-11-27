@@ -92,6 +92,8 @@ exports.sanitizeProduct = (req, res, next) => {
     location,
     questions,
     priceUnit,
+    displayUser,
+    condition,
   } = req.body;
 
   req.modelToAdd = {
@@ -104,8 +106,12 @@ exports.sanitizeProduct = (req, res, next) => {
     location,
     questions,
     priceUnit,
+    condition,
+    displayUser,
     updatedAt: Date.now(),
-    user: user.id,
+    // TODO uncomment it
+    // user: user.id,
+    user: '6517469bdf7fda605983bb7b',
   };
 
   next();

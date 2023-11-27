@@ -1,4 +1,5 @@
 const express = require('express');
+const morgan = require('morgan');
 
 const Exception = require('./utils/handlers/exception');
 const Errors = require('./utils/constants/errors');
@@ -11,6 +12,8 @@ const app = express();
 // convert response requests to json
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
+app.use(morgan('dev'));
 
 // app routes
 app.use('/', routes);

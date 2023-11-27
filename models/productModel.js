@@ -3,10 +3,12 @@ const mongoose = require('mongoose');
 const Constants = require('../utils/constants/constants');
 
 const productLocationSchema = require('./schemas/positionSchema');
+const { bool } = require('sharp');
 
 const productSchema = new mongoose.Schema({
   name: {
     type: String,
+    unique: [true, 'Please choose a different product name'],
     required: [true, 'Please provide `name` as well.'],
   },
   price: {
@@ -25,6 +27,11 @@ const productSchema = new mongoose.Schema({
     minLength: 3,
     maxLength: 1000,
     required: [true, 'Please provide `description` as well.'],
+  },
+  condition: {
+    type: String,
+    enum: ['new', 'used'],
+    default: 'new',
   },
   location: {
     type: productLocationSchema,
@@ -105,8 +112,16 @@ productSchema.pre(/^findById/, function (next) {
 productSchema.pre(/^find/, function (next) {
   this.populate({
     path: Constants.models.products.PATH,
-    select: Constants.models.products.SELECT,
+    // select: Constants.models.products.SELECT,
   });
+
+  next();
+});
+
+productSchema.post('save', async (product, next) => {
+  console.log('Pre save middleware called!', product);
+
+  await product.populate(Constants.models.products.PATH);
 
   next();
 });
