@@ -40,6 +40,10 @@ const productSchema = new mongoose.Schema({
   imageUrls: {
     type: [String],
   },
+  displayUser: {
+    type: Boolean,
+    default: true,
+  },
   details: [
     {
       type: mongoose.Schema.Types.Mixed,
