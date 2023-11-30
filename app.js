@@ -26,9 +26,8 @@ app.use('/', routes);
 // });
 
 app.all('*', (req, res, next) => {
-  next(
-    new Exception(Errors.NO_ROUTE_FOUND.MESSAGE, Errors.NO_ROUTE_FOUND.CODE)
-  );
+  console.log('Invalid route found!');
+  next(new Exception(Errors.NO_ROUTE_FOUND.MESSAGE, 404));
 });
 
 app.use(globalErrorHandler);

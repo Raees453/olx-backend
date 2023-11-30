@@ -20,8 +20,8 @@ module.exports = globalErrorHandler = (err, req, res, next) => {
 };
 
 const sendDevelopmentError = (err, res) => {
-  return res.status(500).json({
-    status: err.status,
+  return res.status(err.code).json({
+    status: false,
     name: err.name,
     message: err.message,
     stack: err.stack,

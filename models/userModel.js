@@ -99,6 +99,9 @@ const userSchema = new mongoose.Schema({
   isPhoneVerified: { type: Boolean },
 });
 
+// Manually create unique index on the email field
+userSchema.index({ email: 1 }, { unique: true });
+
 userSchema.pre('findOne', async function (next) {
   this.loggedInAt = Date.now();
   this.updatedAt = Date.now();
@@ -128,6 +131,10 @@ userSchema.pre('save', async function (next) {
 
 userSchema.methods.comparePassword = function (password) {
   return bcrypt.compare(this.password, password);
+};
+
+userSchema.methods.sanitise = function () {
+  this.password = undefined;
 };
 
 userSchema.methods.generateResetPasswordToken = async function () {

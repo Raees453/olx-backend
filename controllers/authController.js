@@ -50,6 +50,8 @@ exports.signUpWithEmail = asyncHandler(async (req, res, next) => {
     return next(new Exception('Some error occurred', 500));
   }
 
+  user.sanitise();
+
   return res.status(201).json({
     success: true,
     data: user,
@@ -67,12 +69,12 @@ exports.login = asyncHandler(async (req, res, next) => {
 
   const user = await User.findOne({ email }).select('+password');
 
-  if (user.passwordResetToken && user.passwordResetTokenExpiresIn) {
-    return next(new Exception('Please change your password before login', 403));
-  }
-
   if (!user) {
     return next(new Exception('No User found', 404));
+  }
+
+  if (user.passwordResetToken && user.passwordResetTokenExpiresIn) {
+    return next(new Exception('Please change your password before login', 403));
   }
 
   const isPasswordValid = user.comparePassword(password);
@@ -85,9 +87,13 @@ exports.login = asyncHandler(async (req, res, next) => {
     expiresIn: process.env.JWT_EXPIRES_IN,
   });
 
+  user.sanitise();
+
+  user.token = token;
+
   return res.status(200).json({
     status: true,
-    token,
+    data: user,
   });
 });
 
