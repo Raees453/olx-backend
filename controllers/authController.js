@@ -18,11 +18,22 @@ exports.checkForUniquePhoneOrEmail = asyncHandler(async (req, res, next) => {
     return next(new Exception('Please provide email or phone', 404));
   }
 
-  const user = await User.findOne({
-    email: email,
-  });
-
   if (email) {
+    const user = await User.findOne({
+      email: email,
+    });
+
+    return res.status(200).json({
+      success: true,
+      new: user?.email === undefined,
+    });
+  }
+
+  if (phone) {
+    const user = await User.findOne({
+      phone: phone,
+    });
+
     return res.status(200).json({
       success: true,
       new: user?.email === undefined,
@@ -36,8 +47,6 @@ exports.checkForUniquePhoneOrEmail = asyncHandler(async (req, res, next) => {
 });
 
 exports.signUpWithEmail = asyncHandler(async (req, res, next) => {
-  console.log('Sign up called');
-
   const { email, password, confirmPassword } = req.body;
 
   const user = await User.create({
@@ -58,7 +67,20 @@ exports.signUpWithEmail = asyncHandler(async (req, res, next) => {
   });
 });
 
-exports.signUpWithPhone = asyncHandler(async (req, res, next) => {});
+exports.signUpWithPhone = asyncHandler(async (req, res, next) => {
+  const user = await User.create(req.modelToAdd);
+
+  if (!user) {
+    return next(new Exception('Some error occurred', 500));
+  }
+
+  user.sanitise();
+
+  return res.status(201).json({
+    success: true,
+    data: user,
+  });
+});
 
 exports.login = asyncHandler(async (req, res, next) => {
   const { email, password } = req.body;
@@ -91,9 +113,11 @@ exports.login = asyncHandler(async (req, res, next) => {
 
   user.token = token;
 
+  const newUse = { ...user._doc, token };
+
   return res.status(200).json({
     status: true,
-    data: user,
+    data: newUse,
   });
 });
 
@@ -179,6 +203,10 @@ exports.authorize = asyncHandler(async (req, res, next) => {
   const token = authorization.split(' ')[1];
   const secret = process.env.JWT_SECRET;
 
+  if (token === 'null') {
+    return next(new Exception('You are not logged in', 403));
+  }
+
   const userDetails = await verifyAuthToken(token, secret);
 
   if (!userDetails) {
@@ -219,3 +247,31 @@ exports.loginWithGoogle = asyncHandler(async (req, res, next) => {});
 exports.loginWithFacebook = asyncHandler(async (req, res, next) => {});
 
 exports.loginWithPhone = asyncHandler(async (req, res, next) => {});
+
+exports.sanitise = (req, res, next) => {
+  const {
+    email,
+    phone,
+    password,
+    confirmPassword,
+    name,
+    bio,
+    gender,
+    dob,
+    photo,
+  } = req.body;
+
+  req.modelToAdd = {
+    email,
+    phone,
+    password,
+    confirmPassword,
+    name,
+    bio,
+    gender,
+    dob,
+    photo,
+  };
+
+  next();
+};

@@ -5,7 +5,6 @@ const Constants = require('../utils/constants/constants');
 const categorySchema = new mongoose.Schema({
   name: {
     type: String,
-    unique: true,
     required: [true, 'Please provide a category id'],
   },
   image: {
@@ -15,7 +14,6 @@ const categorySchema = new mongoose.Schema({
     {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'Category',
-      // unique: true,
     },
   ],
   count: {
@@ -28,7 +26,7 @@ const categorySchema = new mongoose.Schema({
   },
 });
 
-categorySchema.index({ _id: 1, 'subCategories._id': 1 }, { unique: true });
+categorySchema.index({ _id: 1, 'subCategories._id': 1 });
 
 categorySchema.pre(/^findOne/, function (next) {
   this.populate({
@@ -42,6 +40,14 @@ categorySchema.pre(/^findOne/, function (next) {
 categorySchema.post(/^findOne/, function (category) {
   category.count++;
   category.save();
+  category.sanitise();
 });
+
+categorySchema.methods.sanitise = function () {
+  const id = this._id;
+  this.__v = undefined;
+  this._id = undefined;
+  this.id = id;
+};
 
 module.exports = mongoose.model('Category', categorySchema);

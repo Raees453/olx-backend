@@ -6,14 +6,24 @@ const mongoose = require('mongoose');
 const dbPassword = process.env.DATABASE_PASSWORD;
 const dbUrl = process.env.DATABASE_URL.replace('<password>', dbPassword);
 
+// Command to run the file: 'node seeds/add_categories.js'
+// TODO STEPS TO PERFORM BEFORE EXECUTING THIS SEED FILE
+// TODO 1. Comment All the Pre/Post Middlewares as they will make the server throw **ParallelSaveError**
+
 mongoose
   .connect(dbUrl, {
     useNewUrlParser: true,
     useUnifiedTopology: true,
   })
   .then(async () => {
+    // This is to ensure the name uniqueness
+    await Category.deleteMany({});
+
     console.log('Database Connected');
+
     await insertCategories(majorCategories);
+
+    console.info('Collection Inserted Successfully\nBye!');
     process.exit(0);
   })
   .catch(console.error);
@@ -25,19 +35,18 @@ const insertCategories = async (categories, parentCategoryId = null) => {
       image: categoryData.image,
     };
 
-    const category = new Category(data);
+    const category = await Category.create(data);
+
+    console.info(`Inserted ${category.name} successfully`);
 
     if (parentCategoryId) {
-      // Assign the parent category ID to the subcategory's subCategories array
       const parentCategory = await Category.findById(parentCategoryId);
       parentCategory.subCategories.push(category._id);
       await parentCategory.save();
     }
 
-    await category.save();
-
     if (categoryData.subCategories && categoryData.subCategories.length > 0) {
-      await insertCategories(categoryData.subCategories, category._id);
+      await insertCategories(categoryData.subCategories, category.id);
     }
   }
 };
@@ -199,15 +208,15 @@ const majorCategories = [
       'https://storage.googleapis.com/olx-backend-400713.appspot.com/categories/profile-651746ec08a1b7cf9b481515.png?GoogleAccessId=firebase-adminsdk-ic6ep%40olx-backend-400713.iam.gserviceaccount.com&Expires=3253261336&Signature=UhtX353NqaeGw5B8cahR6RY5%2Bj211lafaeSzYm2gJm5YmFMYjZoaSRRB9Ikjl36pNoFcDBfObjUSFpsgoFknVK7WlVJOqkJEyGI1Ca2%2BEo%2B%2BuqMROKaONP1HNPghrVodSc%2BF7ccc841%2B4GBOrwBWsee5X%2FEvzbBst3StXTMWhHpTXXBNOg%2FmSx1tcdPonHAxUH1hVnfvYhkOihbBpDVF5ZewAIGtt3ieCPkWlbfdQUPYdXeD23K%2FBDZzkasC7Rw30oS%2Bo2XW6pLps%2FFrbtwNnwKzVXgE6nmhA7RBIG4U4bLQr84mCBDY1yFVIGLy4ggVSQTnE3MLchYjKxQg17NHqA%3D%3D',
     subCategories: [
       {
-        name: 'Houses',
+        name: 'Houses for Rent',
         subCategories: [],
       },
       {
-        name: 'Portions & Floors',
+        name: 'Portions & Floors for Rent',
         subCategories: [],
       },
       {
-        name: 'Apartments & Flats',
+        name: 'Apartments & Flats for Rent',
         subCategories: [],
       },
       {

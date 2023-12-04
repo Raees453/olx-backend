@@ -112,8 +112,6 @@ exports.updateQuestionById = asyncHandler(async (req, res, next) => {
     { new: true }
   );
 
-  console.log('Product: ', product);
-
   if (!product) {
     return next(new Exception('No Product found with provided id', 404));
   }

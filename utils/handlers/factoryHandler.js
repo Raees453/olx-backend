@@ -41,10 +41,13 @@ exports.findOneAndUpdate = (Model, updateOptions, ...populateOptionsList) =>
     const { id } = req.params;
 
     updateOptions.new = true;
+
     const doc = await populateQuery(
       Model.findByIdAndUpdate(id, updateOptions),
       populateOptionsList
     );
+
+    doc.sanitise();
 
     return sendResponse(doc, res, next);
   });
@@ -59,6 +62,8 @@ exports.findMany = (Model, ...populateOptionsList) =>
       .filterByLocationRadius();
 
     const docs = await filteredQuery.query;
+
+    docs.forEach((doc) => doc.sanitise());
 
     return sendResponse(docs, res, next);
   });
@@ -91,7 +96,6 @@ exports.addOne = (Model) =>
       return next(new Exception('Please provide a model to save', 404));
     }
 
-    console.log(modelToAdd);
     const doc = await Model.create(modelToAdd);
 
     return sendResponse(doc, res, next);

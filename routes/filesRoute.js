@@ -12,7 +12,7 @@ const upload = multer({ storage });
 // router.use(authController.authorize);
 // router.use();
 
-router.post('/upload', upload.single('file'), fileController.uploadProfile);
+router.post('/upload', upload.single('file'), fileController.uploadImage);
 
 // router.post("/upload", upload.array("files", 10), fileController.uploadFiles);
 

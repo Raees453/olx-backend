@@ -34,12 +34,13 @@ const userSchema = new mongoose.Schema({
   phone: {
     type: String,
     trim: true,
+    unique: true,
   },
   email: {
     type: String,
     trim: true,
     lowercase: true,
-    unique: [true, 'Email already exists.'],
+    unique: true,
     required: [true, 'Please provide `email`.'],
     validate: {
       validator: validator.isEmail,
@@ -99,9 +100,6 @@ const userSchema = new mongoose.Schema({
   isPhoneVerified: { type: Boolean },
 });
 
-// Manually create unique index on the email field
-userSchema.index({ email: 1 }, { unique: true });
-
 userSchema.pre('findOne', async function (next) {
   this.loggedInAt = Date.now();
   this.updatedAt = Date.now();
@@ -124,7 +122,7 @@ userSchema.pre('save', async function (next) {
 
   this.password = await bcrypt.hash(this.password, Constants.PASSWORD_SALT);
 
-  this.slug = slugify(this.name);
+  if (this.name) this.slug = slugify(this.name);
 
   next();
 });

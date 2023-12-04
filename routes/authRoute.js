@@ -6,7 +6,13 @@ const router = express.Router();
 
 router.get('/unique', authController.checkForUniquePhoneOrEmail);
 
-router.post('/signup', authController.signUpWithEmail);
+router.post('/signup/email', authController.signUpWithEmail);
+
+router.post(
+  '/signup/phone',
+  authController.sanitise,
+  authController.signUpWithPhone
+);
 
 router.get('/login', authController.login);
 

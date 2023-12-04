@@ -110,8 +110,8 @@ exports.sanitizeProduct = (req, res, next) => {
     displayUser,
     updatedAt: Date.now(),
     // TODO uncomment it
-    // user: user.id,
-    user: '6517469bdf7fda605983bb7b',
+    user: user.id,
+    // user: '6517469bdf7fda605983bb7b',
   };
 
   next();

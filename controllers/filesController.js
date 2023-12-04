@@ -17,27 +17,28 @@ const resizeImage = async (file, filename, width = 200, height = 200) => {
   return sharp(file.buffer).resize(width, height).toFile(filename);
 };
 
-exports.uploadProfile = asyncHandler(async (req, res, next) => {
+exports.uploadImage = asyncHandler(async (req, res, next) => {
   let { file } = req;
 
   if (!file) {
     return next(new Exception('Please provide a file', 404));
   }
 
-  const id = req.user?.id || '651746ec08a1b7cf9b481515';
+  file = await sharp(file.buffer)
+    .jpeg({ quality: 80 })
+    .resize(820, 312)
+    .toBuffer();
 
-  const filename = `profile-${id}.png`;
+  const filename = `image-${Date.now().toString()}.png`;
 
-  const destinationPath = 'profiles/' + filename;
-
-  // TODO resizing the image not working
-  // file = await resizeImage(file, filename);
+  const destinationPath = 'images/' + filename;
 
   const fileToUpload = bucket.file(destinationPath);
 
   const fileStream = fileToUpload.createWriteStream({
     metadata: {
-      contentType: file.mimetype,
+      contentType: 'image/jpeg',
+      // contentType: file.mimetype,
     },
   });
 
@@ -59,7 +60,7 @@ exports.uploadProfile = asyncHandler(async (req, res, next) => {
     });
   });
 
-  fileStream.end(file.buffer);
+  fileStream.end(Buffer.from(file));
 });
 
 exports.uploadAdImage = asyncHandler(async (req, res, next) => {});

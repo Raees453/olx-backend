@@ -1,9 +1,10 @@
 const mongoose = require('mongoose');
 
+const User = require('../models/userModel');
+
 const Constants = require('../utils/constants/constants');
 
 const productLocationSchema = require('./schemas/positionSchema');
-const { bool } = require('sharp');
 
 const productSchema = new mongoose.Schema({
   name: {
@@ -39,6 +40,8 @@ const productSchema = new mongoose.Schema({
   },
   imageUrls: {
     type: [String],
+    maxlength: [10, 'Image URLs cannot exceed 10.'],
+    // TODO, it should have a validator to make all the urls unique
   },
   displayUser: {
     type: Boolean,
@@ -102,15 +105,32 @@ const productSchema = new mongoose.Schema({
   },
 });
 
+productSchema.index({ name: 1 });
+productSchema.index({ condition: 1 });
 productSchema.index({ location: '2dsphere' });
 
 // TODO not working at all
-productSchema.pre(/^findById/, function (next) {
+productSchema.pre(/^findById/, async function (next) {
   console.log('Pre find by id middleware called', this);
 
   this.obj.updatedAt = Date.now;
 
   next();
+});
+
+productSchema.post('findOne', async function (doc) {
+  console.log('Find One POST Middleware Called for Product', doc);
+
+  if (doc.displayUser) {
+    // doc._doc.user = await User.findById(doc.user);
+
+    await doc.populate({
+      path: Constants.models.users.PATH,
+      // select: Constants.models.users.SELECT,
+    });
+  }
+
+  // next();
 });
 
 productSchema.pre(/^find/, function (next) {
@@ -123,8 +143,6 @@ productSchema.pre(/^find/, function (next) {
 });
 
 productSchema.post('save', async (product, next) => {
-  console.log('Pre save middleware called!', product);
-
   await product.populate(Constants.models.products.PATH);
 
   next();

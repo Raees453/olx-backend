@@ -12,12 +12,14 @@ const router = express.Router();
 
 router.use('/:id/questions', productQuestionsRouter);
 
-router.route('/').get(productController.getProducts).post(
-  // authController.authorize,
-  productController.sanitizeProduct,
-  // upload.array('images'),
-  productController.addProduct
-);
+router
+  .route('/')
+  .get(productController.getProducts)
+  .post(
+    authController.authorize,
+    productController.sanitizeProduct,
+    productController.addProduct
+  );
 
 router
   .route('/:id')

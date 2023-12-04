@@ -20,6 +20,10 @@ module.exports = globalErrorHandler = (err, req, res, next) => {
 };
 
 const sendDevelopmentError = (err, res) => {
+  if (!err.isOperational) {
+    err.code = 500;
+  }
+
   return res.status(err.code).json({
     status: false,
     name: err.name,
@@ -29,22 +33,47 @@ const sendDevelopmentError = (err, res) => {
 };
 
 const sendProductionError = (err, res) => {
-  let error;
-  if (err.name === 'MongoServerError') {
+  console.error('Inside Production Error', err.toString());
+
+  let error = err;
+
+  if (err.code === 11000) {
     error = handleUniqueValueError(err);
+  } else if (err.name === 'CastError') {
+    error = handleCastError(err);
+  } else if (err.name === 'ValidationError') {
+    error = handleValidationError(err);
   }
 
-  if (err.isOperational) {
-    return res.status(err.code).json({
+  if (error.isOperational) {
+    return res.status(error.code).json({
       success: false,
       data: error.message,
     });
   }
 
-  return res
-    .status(Errors.SOMETHING_WENT_WRONG.CODE)
-    .json({ success: false, data: Errors.SOMETHING_WENT_WRONG.MESSAGE });
+  return res.status(Errors.SOMETHING_WENT_WRONG.CODE).json({
+    success: false,
+    message: Errors.SOMETHING_WENT_WRONG.MESSAGE,
+  });
 };
 
-const handleUniqueValueError = (err) =>
-  new Exception(`Value: ${err.keyValue.name} already exists`, 403);
+const handleUniqueValueError = (err) => {
+  let message = '';
+
+  if (err.keyValue.name) {
+    message = err.keyValue.name;
+  } else if (err.keyValue.email) {
+    message = err.keyValue.email;
+  } else if (err.keyValue.phone) {
+    message = err.keyValue.phone;
+  }
+
+  return new Exception(`Value: ${message} already exists`, 409);
+};
+
+const handleCastError = (err) =>
+  new Exception(`Invalid id ${err.value} provided`, 404);
+
+const handleValidationError = (err) =>
+  new Exception(`Invalid data provided!`, 400);

@@ -31,6 +31,10 @@ const CONSTANTS = {
       PATH: 'categories',
       SELECT: 'name subCategories',
     },
+    users: {
+      PATH: 'user',
+      SELECT: 'name email phone',
+    },
   },
 };
 
