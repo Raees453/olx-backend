@@ -24,9 +24,10 @@ exports.uploadImage = asyncHandler(async (req, res, next) => {
     return next(new Exception('Please provide a file', 404));
   }
 
+  // TODO no need to resize the image as it's not doing good to front end, just drop image quality
   file = await sharp(file.buffer)
-    .jpeg({ quality: 80 })
-    .resize(820, 312)
+    .jpeg({ quality: 70 })
+    // .resize(820, 312)
     .toBuffer();
 
   const filename = `image-${Date.now().toString()}.png`;

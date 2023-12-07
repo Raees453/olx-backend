@@ -7,6 +7,9 @@ const mongoose = require('mongoose');
 const dbPassword = process.env.DATABASE_PASSWORD;
 const dbUrl = process.env.DATABASE_URL.replace('<password>', dbPassword);
 
+// TODO always return basic user details like name, created at, id, image
+// TODO get an API to get simple user data (other profile)
+
 mongoose
   .connect(dbUrl, {
     useNewUrlParser: true,
