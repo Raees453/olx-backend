@@ -6,6 +6,14 @@ const Exception = require('../utils/handlers/exception');
 
 const asyncHandler = require('../utils/handlers/asyncHandler');
 
+exports.getUserProfile = asyncHandler(async (req, res, next) => {
+  console.log(req.queryParams, req.id);
+
+  res.status(200).json({
+    status: true,
+  });
+});
+
 exports.sanitiseUser = (req, res, next) => {
   const { photo, name, bio, dob, phone } = req.body;
 
@@ -22,13 +30,17 @@ exports.getMyProfile = asyncHandler(async (req, res, next) => {
     return next(new Exception('Please login to access this feature!', 401));
   }
 
-  if (!active) {
+  const user = await User.findById(id);
+
+  if (!user.active) {
     return next(new Exception('Your account has been disabled!', 401));
   }
 
+  user.sanitise();
+
   return res.status(200).json({
     success: true,
-    data: req.user,
+    data: user,
   });
 });
 

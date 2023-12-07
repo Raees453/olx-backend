@@ -6,6 +6,8 @@ const meController = require('../controllers/meController');
 const searchRoute = require('../routes/searchRoutes');
 const router = express.Router();
 
+router.route('/profile/:id').get(meController.getUserProfile);
+
 // needs to be authorized for profile CURD
 router.use(authController.authorize);
 

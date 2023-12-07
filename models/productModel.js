@@ -142,6 +142,15 @@ productSchema.pre(/^find/, function (next) {
   next();
 });
 
+productSchema.pre(/^findOne/, function (next) {
+  this.populate({
+    path: Constants.models.users.PATH,
+    // select: Constants.models.products.SELECT,
+  });
+
+  next();
+});
+
 productSchema.post('save', async (product, next) => {
   await product.populate(Constants.models.products.PATH);
 
