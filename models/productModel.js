@@ -1,7 +1,5 @@
 const mongoose = require('mongoose');
 
-const User = require('../models/userModel');
-
 const Constants = require('../utils/constants/constants');
 
 const productLocationSchema = require('./schemas/positionSchema');
@@ -119,7 +117,9 @@ productSchema.pre(/^findById/, async function (next) {
 });
 
 productSchema.post('findOne', async function (doc) {
-  console.log('Find One POST Middleware Called for Product', doc);
+  if (doc == null) {
+    return;
+  }
 
   if (doc.displayUser) {
     // doc._doc.user = await User.findById(doc.user);

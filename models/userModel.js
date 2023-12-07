@@ -50,7 +50,6 @@ const userSchema = new mongoose.Schema({
   active: {
     type: Boolean,
     default: true,
-    select: false,
   },
   password: {
     type: String,
@@ -96,8 +95,8 @@ const userSchema = new mongoose.Schema({
   passwordResetTokenExpiresIn: {
     type: Date,
   },
-  isEmailVerified: { type: Boolean },
-  isPhoneVerified: { type: Boolean },
+  isEmailVerified: { type: Boolean, default: false },
+  isPhoneVerified: { type: Boolean, default: false },
 });
 
 userSchema.pre('findOne', async function (next) {
@@ -133,6 +132,7 @@ userSchema.methods.comparePassword = function (password) {
 
 userSchema.methods.sanitise = function () {
   this.password = undefined;
+  this.__v = undefined;
 };
 
 userSchema.methods.generateResetPasswordToken = async function () {

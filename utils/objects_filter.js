@@ -58,7 +58,7 @@ class ObjectsFilter {
     return this;
   };
 
-  paginate = function () {
+  paginate = function (pageLimit = DEFAULT_PAGE_LIMIT) {
     let { page, limit } = this.queryString;
 
     if (!page) {
@@ -66,7 +66,7 @@ class ObjectsFilter {
     }
 
     if (!limit) {
-      limit = DEFAULT_PAGE_LIMIT;
+      limit = pageLimit;
     }
 
     const recordsToSkip = (page - 1) * limit;

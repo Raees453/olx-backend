@@ -11,6 +11,28 @@ exports.addProduct = factoryHandler.addOne(Product);
 exports.updateProduct = factoryHandler.updateOne(Product);
 exports.deleteProduct = factoryHandler.deleteOne(Product);
 
+exports.getRelatedProducts = asyncHandler(async (req, res, next) => {
+  const { id } = req.params;
+
+  const product = await Product.findById(id);
+
+  if (!product) {
+    return next(new Exception('No Product Found', 404));
+  }
+
+  const categories = product.categories;
+
+  const products = await Product.find({
+    _id: { $ne: product._id },
+    categories: { $in: categories },
+  }).limit(20);
+
+  return res.status(200).json({
+    success: true,
+    results: products.length,
+    data: products,
+  });
+});
 exports.getCommonQuestions = factoryHandler.addOne(Product);
 exports.addCommonQuestions = factoryHandler.addOne(Product);
 exports.updateCommonQuestions = factoryHandler.addOne(Product);

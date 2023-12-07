@@ -1,15 +1,20 @@
 const FavouriteProduct = require('../models/favouriteProductModel');
-const User = require('../models/userModel');
+const Product = require('../models/productModel');
 
-const Constants = require('../utils/constants/constants');
 const Exception = require('../utils/handlers/exception');
 
 const factoryHandler = require('../utils/handlers/factoryHandler');
 const asyncHandler = require('../utils/handlers/asyncHandler');
 
-exports.sanitiseFavouriteProductModel = (req, _, next) => {
+exports.sanitiseFavouriteProductModel = async (req, _, next) => {
   if (!req.params.id || !req.user.id) {
     return next(new Exception('Please provide product id and user id', 403));
+  }
+
+  const product = await Product.findById(req.params.id);
+
+  if (!product) {
+    return next(new Exception('No Product Found', 404));
   }
 
   req.modelToAdd = {
@@ -21,17 +26,16 @@ exports.sanitiseFavouriteProductModel = (req, _, next) => {
 };
 
 exports.getFavouriteProducts = asyncHandler(async (req, res, next) => {
-  const products = await FavouriteProduct.find({
-    userId: req.user.id,
-  }).populate({
-    path: 'productId',
-    select: 'name price description location createdAt -categories',
-  });
+  const products = await FavouriteProduct.find({ userId: req.user.id })
+    .select({ userId: 0, __v: 0, _id: 0 })
+    .populate({
+      path: 'productId',
+    });
 
   return res.status(200).json({
     success: true,
-    results: products.length,
-    date: products,
+    results: products?.length ?? 0,
+    data: products,
   });
 });
 

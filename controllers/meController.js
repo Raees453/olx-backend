@@ -1,17 +1,31 @@
 const User = require('../models/userModel');
 const Product = require('../models/productModel');
 
-const Constants = require('../utils/constants/constants');
 const Exception = require('../utils/handlers/exception');
 
 const asyncHandler = require('../utils/handlers/asyncHandler');
 
 exports.getUserProfile = asyncHandler(async (req, res, next) => {
-  console.log(req.queryParams, req.id);
+  const { id } = req.params;
+
+  const user = await User.findById(id);
+
+  if (user == null) {
+    return next(new Exception('No User Found', 404));
+  }
+
+  user.sanitise();
+
+  const userProducts = await Product.find({
+    user: user.id,
+  });
 
   res.status(200).json({
     status: true,
+    data: { user, products: userProducts },
   });
+
+  next();
 });
 
 exports.sanitiseUser = (req, res, next) => {

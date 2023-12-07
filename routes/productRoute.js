@@ -1,12 +1,8 @@
 const express = require('express');
-const multer = require('multer');
 
 const productQuestionsRouter = require('./questionRoute');
 const productController = require('../controllers/productController');
 const authController = require('../controllers/authController');
-
-const storage = multer.memoryStorage();
-const upload = multer({ storage });
 
 const router = express.Router();
 
@@ -20,6 +16,8 @@ router
     productController.sanitizeProduct,
     productController.addProduct
   );
+
+router.route('/related/:id').get(productController.getRelatedProducts);
 
 router
   .route('/:id')
