@@ -17,6 +17,8 @@ router.route('/products').get(meController.getMyProduct);
 
 router.route('/').get(meController.getMyProfile);
 
+// router.route('/change-password').post(meController.changePassword)
+
 router.use(meController.sanitiseUser);
 
 router
