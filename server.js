@@ -16,6 +16,7 @@ const dbUrl = process.env.DATABASE_URL.replace('<password>', dbPassword);
 // TODO Work & Sort Product's Custom BSON Data
 // TODO Remove all the log/print commands
 // TODO Always sanitise any object before sending it (remove __v, password, some private inner fields, _id to id, etc)
+// TODO Check for Unique Email should return proper message for deleted user
 
 mongoose
   .connect(dbUrl, {

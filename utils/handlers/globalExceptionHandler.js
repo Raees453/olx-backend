@@ -10,7 +10,14 @@ module.exports = globalErrorHandler = (err, req, res, next) => {
   err.code = err.code || err.statusCode || Errors.SOMETHING_WENT_WRONG.CODE;
   err.message = err.message || Errors.SOMETHING_WENT_WRONG.MESSAGE;
 
-  console.log('Global Error Received, Name:', err.name, 'Code:', err.code, err);
+  console.log(
+    'Global Error Received, Name:',
+    err.name,
+    'Code:',
+    err.code,
+    err.message,
+    err
+  );
 
   if (environment === Constants.DEVELOPMENT) {
     return sendDevelopmentError(err, res);
@@ -48,7 +55,7 @@ const sendProductionError = (err, res) => {
   if (error.isOperational) {
     return res.status(error.code).json({
       success: false,
-      data: error.message,
+      message: error.message,
     });
   }
 
@@ -75,5 +82,9 @@ const handleUniqueValueError = (err) => {
 const handleCastError = (err) =>
   new Exception(`Invalid id ${err.value} provided`, 404);
 
-const handleValidationError = (err) =>
-  new Exception(`Invalid data provided!`, 400);
+const handleValidationError = (err) => {
+  const message =
+    err.toString()?.split(':')?.pop().trim() ?? 'Invalid data provided!';
+
+  return new Exception(message, 400);
+};

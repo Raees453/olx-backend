@@ -227,8 +227,10 @@ exports.authorize = asyncHandler(async (req, res, next) => {
     );
   }
 
+  console.log(user.active);
+
   if (!user.active) {
-    return next(new Exception('Your account is been deleted!', 403));
+    return next(new Exception('Your account is already been deleted!', 403));
   }
 
   req.user = user;

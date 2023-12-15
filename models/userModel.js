@@ -11,14 +11,14 @@ const Constants = require('../utils/constants/constants');
 const userSchema = new mongoose.Schema({
   name: {
     type: String,
-    minLength: 5,
+    minLength: 3,
     maxLength: 30,
     trim: true,
   },
   bio: {
     type: String,
     trim: true,
-    minLength: [20, 'Bio must have a minimum length of 20 characters'],
+    minLength: [10, 'Bio must have a minimum length of 10 characters'],
   },
   slug: {
     type: String,
@@ -94,6 +94,10 @@ const userSchema = new mongoose.Schema({
   },
   passwordResetTokenExpiresIn: {
     type: Date,
+  },
+  showPhone: {
+    type: Boolean,
+    default: true,
   },
   isEmailVerified: { type: Boolean, default: false },
   isPhoneVerified: { type: Boolean, default: false },

@@ -5,6 +5,47 @@ const Exception = require('../utils/handlers/exception');
 
 const asyncHandler = require('../utils/handlers/asyncHandler');
 
+exports.changePassword = asyncHandler(async (req, res, next) => {
+  const { currentPassword, newPassword, confirmPassword } = req.body;
+
+  if (!currentPassword || !newPassword || !confirmPassword) {
+    return next(
+      new Exception(
+        'Please provide current and new password and confirm new password'
+      )
+    );
+  }
+
+  if (newPassword != confirmPassword) {
+    return next(new Exception('Passwords dont match'));
+  }
+
+  const user = await User.findById(req.user.id).select('+password');
+
+  console.log(user.password);
+
+  if (user == null || !user.active) {
+    return next(
+      new Exception('No User exists or the user has deleted the account')
+    );
+  }
+
+  const isCorrectPassword = user.comparePassword(currentPassword);
+
+  if (!isCorrectPassword) {
+    return next(new Exception('Invalid password provided.'));
+  }
+
+  await user.save();
+
+  user.sanitise();
+
+  res.status(200).json({
+    success: true,
+    user,
+  });
+});
+
 exports.getUserProfile = asyncHandler(async (req, res, next) => {
   const { id } = req.params;
 
