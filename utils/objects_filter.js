@@ -135,6 +135,25 @@ class ObjectsFilter {
 
     return calculatedRadius || DEFAULT_SEARCH_RADIUS;
   };
+
+  filterByNameOrTitle = function () {
+    const { name } = this.queryString;
+
+    if (!name) {
+      return this;
+    }
+
+    const regexPattern = new RegExp(name, 'i');
+
+    this.query = this.query.find({
+      $or: [
+        { name: { $regex: regexPattern } },
+        { description: { $regex: regexPattern } },
+      ],
+    });
+
+    return this;
+  };
 }
 
 module.exports = ObjectsFilter;
