@@ -6,6 +6,8 @@ const bcrypt = require('bcryptjs');
 const config = require('config');
 const validator = require('validator');
 
+const addressScheme = require('./addressModel');
+
 const Constants = require('../utils/constants/constants');
 
 const userSchema = new mongoose.Schema({
@@ -101,6 +103,7 @@ const userSchema = new mongoose.Schema({
   },
   isEmailVerified: { type: Boolean, default: false },
   isPhoneVerified: { type: Boolean, default: false },
+  addresses: [addressScheme],
 });
 
 userSchema.pre('findOne', async function (next) {
@@ -111,6 +114,8 @@ userSchema.pre('findOne', async function (next) {
 });
 
 userSchema.pre('save', async function (next) {
+  console.log('Pre Save Middle ware called');
+
   this.confirmPassword = undefined;
   this.updatedAt = Date.now();
 
