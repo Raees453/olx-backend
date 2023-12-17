@@ -55,12 +55,31 @@ exports.getProducts = asyncHandler(async (req, res, next) => {
     .paginate()
     // .selectFields()
     .filterByLocationRadius()
+    .filterByNameOrTitle()
     .filterByCategoryID();
+
+  const regexPattern = new RegExp(req.query.name, 'i');
+
+  filteredQuery.query = Product.find({
+    $or: [
+      { name: { $regex: regexPattern } },
+      { description: { $regex: regexPattern } },
+    ],
+  });
 
   const docs = await filteredQuery.query;
 
   const maxPrice = results[0]?.maxPrice ?? 0;
   const minPrice = results[0]?.minPrice ?? 0;
+
+  // const regexPattern = new RegExp(req.query.name, 'i');
+  //
+  // const products = await Product.find({
+  //   $or: [
+  //     { name: { $regex: regexPattern } },
+  //     { description: { $regex: regexPattern } },
+  //   ],
+  // });
 
   return res.status(200).json({
     success: true,
